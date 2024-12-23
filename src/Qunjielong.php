@@ -58,10 +58,10 @@ class Qunjielong
     }
 
     public function token(
-        array|Collection|null $options = [],
         array|Collection|null $query = [],
         string                $url = '/open/auth/token',
         array|Collection|null $urlParameters = null,
+        array|Collection|null $options = [],
         \Closure|null         $responseHandler = null
 
     ): Qunjielong
@@ -90,10 +90,10 @@ class Qunjielong
     }
 
     public function getGhomeInfo(
-        array|Collection|null $options = [],
         array|Collection|null $query = [],
         string                $url = '/open/api/ghome/getGhomeInfo',
         array|Collection|null $urlParameters = null,
+        array|Collection|null $options = [],
         \Closure|null         $responseHandler = null
     ): array|null
     {
@@ -138,4 +138,38 @@ class Qunjielong
         }
         return $this;
     }
+
+    public function queryActGoods(
+        array|Collection|null $data = [],
+        array|Collection|null $options = [],
+        string                $url = '/open/api/act_goods/query_act_goods?accessToken={accessToken}',
+        array|Collection|null $urlParameters = null,
+        \Closure|null         $responseHandler = null
+    ): array|null
+    {
+        $data = \collect($data);
+        $options = \collect($options);
+        $urlParameters = \collect($urlParameters);
+        \data_fill($urlParameters, 'accessToken', $this->getAccessToken());
+        $response = Http::baseUrl($this->getBaseUrl())
+            ->asJson()
+            ->withOptions($options->toArray())
+            ->withUrlParameters($urlParameters->toArray())
+            ->post(
+                $url,
+                $data->toArray(),
+            );
+        if ($responseHandler) {
+            return value($responseHandler($response));
+        }
+        if ($response->ok()) {
+            $json = $response->json();
+            if (Validator::make($json, ['code' => 'required|integer|size:200'])->messages()->isEmpty()) {
+                return \data_get($json, 'data', []) ?? null;
+            }
+        }
+        return null;
+    }
+
+
 }
