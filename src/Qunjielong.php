@@ -14,7 +14,7 @@ class Qunjielong
     /**
      * @var string
      */
-    protected string $baseUrl = 'https://openapi.qunjielong.com';
+    protected string $baseUrl = 'https://openapi.qunjielong.com/';
 
     /**
      * @var string
